@@ -13,11 +13,18 @@ import {
   Edit as EditIcon,
   Login as LoginIcon,
 } from '@mui/icons-material';
+import { useAuth } from '../../hooks/useAuth';
 
 export function ProfilePage() {
-  const handleGoogleLogin = () => {
-    // TODO: Supabase Google認証実装
-    alert('Googleログイン機能は正式版で実装予定です');
+  const { signInWithGoogle } = useAuth();
+
+  const handleGoogleLogin = async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      console.error('Google login error:', error);
+      alert('ログインに失敗しました。もう一度お試しください。');
+    }
   };
 
   return (
