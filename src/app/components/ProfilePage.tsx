@@ -16,7 +16,7 @@ import {
 import { useAuth } from '../../hooks/useAuth';
 
 export function ProfilePage() {
-  const { signInWithGoogle } = useAuth();
+  const { user, signInWithGoogle, signOut } = useAuth();
 
   const handleGoogleLogin = async () => {
     try {
@@ -27,43 +27,90 @@ export function ProfilePage() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  // ユーザー情報を取得
+  const displayName = user?.user_metadata?.name || user?.email || 'ユーザー';
+  const avatarUrl = user?.user_metadata?.avatar_url;
+  const email = user?.email || 'guest@saucer.app';
+
   return (
     <Box>
       <Box sx={{ textAlign: 'center', mb: 4, position: 'relative' }}>
-        <Button
-          variant="contained"
-          startIcon={<LoginIcon />}
-          onClick={handleGoogleLogin}
-          sx={{
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            bgcolor: '#4285f4',
-            color: 'white',
-            textTransform: 'none',
-            fontSize: '0.875rem',
-            '&:hover': { bgcolor: '#357ae8' },
-          }}
-        >
-          Googleでログイン
-        </Button>
-        <Avatar
-          sx={{
-            width: 80,
-            height: 80,
-            fontSize: '2.5rem',
-            bgcolor: '#6366f1',
-            margin: '0 auto',
-            mb: 2,
-          }}
-        >
-          👤
-        </Avatar>
+        {user ? (
+          <Button
+            variant="outlined"
+            startIcon={<LoginIcon />}
+            onClick={handleLogout}
+            sx={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              borderColor: '#ef4444',
+              color: '#ef4444',
+              textTransform: 'none',
+              fontSize: '0.875rem',
+              '&:hover': { borderColor: '#dc2626', bgcolor: '#fef2f2' },
+            }}
+          >
+            ログアウト
+          </Button>
+        ) : (
+          <Button
+            variant="contained"
+            startIcon={<LoginIcon />}
+            onClick={handleGoogleLogin}
+            sx={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              bgcolor: '#4285f4',
+              color: 'white',
+              textTransform: 'none',
+              fontSize: '0.875rem',
+              '&:hover': { bgcolor: '#357ae8' },
+            }}
+          >
+            Googleでログイン
+          </Button>
+        )}
+        
+        {avatarUrl ? (
+          <Avatar
+            src={avatarUrl}
+            sx={{
+              width: 80,
+              height: 80,
+              margin: '0 auto',
+              mb: 2,
+            }}
+          />
+        ) : (
+          <Avatar
+            sx={{
+              width: 80,
+              height: 80,
+              fontSize: '2.5rem',
+              bgcolor: '#6366f1',
+              margin: '0 auto',
+              mb: 2,
+            }}
+          >
+            {displayName.charAt(0).toUpperCase()}
+          </Avatar>
+        )}
+        
         <Typography variant="h5" sx={{ fontWeight: 600, color: '#2d3748', mb: 0.5 }}>
-          ゲストユーザー
+          {displayName}
         </Typography>
         <Typography variant="body2" sx={{ color: '#718096', mb: 1 }}>
-          guest@saucer.app
+          {email}
         </Typography>
         <Stack direction="row" spacing={1} justifyContent="center" sx={{ mt: 2 }}>
           <Chip
