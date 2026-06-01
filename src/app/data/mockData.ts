@@ -1,4 +1,4 @@
-// 仮想投稿データ生成
+// 投稿データ
 
 interface Reaction {
   insight: number;
@@ -26,131 +26,142 @@ interface Thought {
   allowReplies?: boolean;
 }
 
-const users = [
+// ダミーユーザー（システム用）
+export const users = [
   {
-    id: 'user1',
-    name: '田中 健太',
-    avatar: '👨‍💼',
+    id: 'system1',
+    name: 'デモユーザーA',
+    avatar: '🦁', // ライオン
     registrationNumber: 1,
-    registeredAt: new Date(2025, 0, 1)
+    registeredAt: new Date(2026, 0, 15)
   },
   {
-    id: 'user2',
-    name: '佐藤 美咲',
-    avatar: '👩‍🎨',
+    id: 'system2',
+    name: 'デモユーザーB',
+    avatar: '🐺', // 狼
     registrationNumber: 2,
-    registeredAt: new Date(2025, 0, 2)
+    registeredAt: new Date(2026, 1, 3)
   },
   {
-    id: 'user3',
-    name: '山田 悠人',
-    avatar: '👨‍🔬',
+    id: 'system3',
+    name: 'デモユーザーC',
+    avatar: '🐘', // 象
     registrationNumber: 3,
-    registeredAt: new Date(2025, 0, 3)
+    registeredAt: new Date(2026, 2, 10)
   },
 ];
 
-const tagsList = [
-  '朝', '自然', '人間関係', '心理', 'コミュニケーション',
-  '仕事', '哲学', '日常', '気づき', '習慣',
-  '読書', '健康', '時間', '感情', '思考',
-  '食事', '散歩', '季節', '夜', '音楽'
+// リアルな投稿10件
+export const mockThoughts: Thought[] = [
+  {
+    id: 'thought1',
+    content: '電車の窓から見える街並みが、毎日同じ景色なのに季節で全然違って見える。今日は桜が咲き始めていて、春が来たんだなって実感した。',
+    createdAt: new Date(2026, 4, 25, 7, 45),
+    tags: ['朝', '通勤', '季節'],
+    author: users[0],
+    reactions: { insight: 12, resonance: 25, thinking: 3, inspiration: 8 },
+    replyCount: 2,
+    allowReplies: true,
+  },
+  {
+    id: 'thought2',
+    content: 'ランチの時間、いつもと違う店に入ってみた。新しい味との出会いって、日常に小さな冒険を加えてくれる気がする。',
+    createdAt: new Date(2026, 4, 24, 12, 30),
+    tags: ['昼', '食事中'],
+    author: users[1],
+    reactions: { insight: 8, resonance: 18, thinking: 2, inspiration: 15 },
+    replyCount: 1,
+    allowReplies: true,
+  },
+  {
+    id: 'thought3',
+    content: '夕焼けを見ながら散歩していたら、子どもたちが公園で遊んでいた。自分もこうやって遊んでいたなと懐かしくなった。時間って不思議。',
+    createdAt: new Date(2026, 4, 23, 18, 15),
+    tags: ['夕方', '散歩'],
+    author: users[2],
+    reactions: { insight: 15, resonance: 32, thinking: 7, inspiration: 10 },
+    replyCount: 3,
+    allowReplies: true,
+  },
+  {
+    id: 'thought4',
+    content: '仕事の合間にふと窓の外を見たら、雲が面白い形をしていた。忙しい時こそ、こういう小さなことに気づける余裕を持ちたい。',
+    createdAt: new Date(2026, 4, 22, 14, 20),
+    tags: ['仕事中'],
+    author: users[0],
+    reactions: { insight: 20, resonance: 28, thinking: 5, inspiration: 12 },
+    replyCount: 0,
+    allowReplies: true,
+  },
+  {
+    id: 'thought5',
+    content: '深夜、静かな部屋で本を読んでいると、昼間とは違う思考が浮かんでくる。夜の時間は自分と向き合う貴重な時間だと思う。',
+    createdAt: new Date(2026, 4, 21, 23, 45),
+    tags: ['深夜', '読書中'],
+    author: users[1],
+    reactions: { insight: 18, resonance: 35, thinking: 12, inspiration: 20 },
+    replyCount: 4,
+    allowReplies: true,
+  },
+  {
+    id: 'thought6',
+    content: '朝のコーヒーを淹れる時間が、一日で一番好きな時間かもしれない。香りと静けさが心を落ち着かせてくれる。',
+    createdAt: new Date(2026, 4, 20, 6, 30),
+    tags: ['朝'],
+    author: users[2],
+    reactions: { insight: 10, resonance: 42, thinking: 3, inspiration: 8 },
+    replyCount: 2,
+    allowReplies: true,
+  },
+  {
+    id: 'thought7',
+    content: '通学路で見かける猫が、今日は違う場所にいた。動物にも日々の変化があるんだなと、当たり前のことに気づかされた。',
+    createdAt: new Date(2026, 4, 19, 8, 10),
+    tags: ['朝', '通学'],
+    author: users[0],
+    reactions: { insight: 14, resonance: 21, thinking: 4, inspiration: 9 },
+    replyCount: 1,
+    allowReplies: true,
+  },
+  {
+    id: 'thought8',
+    content: 'お風呂に入りながら今日一日を振り返ると、意外と良いこともあったなと思える。入浴の時間は心のデトックスかも。',
+    createdAt: new Date(2026, 4, 18, 21, 30),
+    tags: ['夜', '入浴中'],
+    author: users[1],
+    reactions: { insight: 16, resonance: 38, thinking: 6, inspiration: 11 },
+    replyCount: 3,
+    allowReplies: true,
+  },
+  {
+    id: 'thought9',
+    content: '休日の午後、特に予定もなくゆっくり過ごす時間。何もしない贅沢というのも、たまには必要だと思う。',
+    createdAt: new Date(2026, 4, 17, 15, 0),
+    tags: ['休日'],
+    author: users[2],
+    reactions: { insight: 11, resonance: 45, thinking: 8, inspiration: 13 },
+    replyCount: 2,
+    allowReplies: true,
+  },
+  {
+    id: 'thought10',
+    content: '勉強中にふと外を見たら、雨が降り始めていた。雨音が集中力を高めてくれる気がする。自然の音って不思議な力がある。',
+    createdAt: new Date(2026, 4, 16, 19, 45),
+    tags: ['夜', '勉強中'],
+    author: users[0],
+    reactions: { insight: 13, resonance: 24, thinking: 9, inspiration: 17 },
+    replyCount: 1,
+    allowReplies: true,
+  },
 ];
 
-const contentTemplates = [
-  'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん',
-  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
-  'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン',
-  '春夏秋冬東西南北上下左右天地人月日火水木金土',
-  '赤青黄緑紫橙桃白黒灰茶空海山川森林草花木石',
-];
-
-function getRandomElement<T>(array: T[]): T {
-  return array[Math.floor(Math.random() * array.length)];
-}
-
-function getRandomInt(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function generateRandomContent(): string {
-  const template = getRandomElement(contentTemplates);
-  const length = getRandomInt(20, 100);
-  let content = '';
-
-  for (let i = 0; i < length; i++) {
-    content += template[Math.floor(Math.random() * template.length)];
-  }
-
-  return content;
-}
-
-function generateRandomTags(): string[] {
-  const numTags = getRandomInt(1, 3);
-  const tags: string[] = [];
-
-  for (let i = 0; i < numTags; i++) {
-    const tag = getRandomElement(tagsList);
-    if (!tags.includes(tag)) {
-      tags.push(tag);
-    }
-  }
-
-  return tags;
-}
-
-function generateRandomReactions(): Reaction {
-  return {
-    insight: getRandomInt(0, 30),
-    resonance: getRandomInt(0, 40),
-    thinking: getRandomInt(0, 25),
-    inspiration: getRandomInt(0, 20),
-  };
-}
-
+// 互換性のための関数
 export function generateMockThoughts(): Thought[] {
-  const thoughts: Thought[] = [];
-  const now = new Date();
-
-  // 100件の投稿を生成
-  for (let i = 0; i < 100; i++) {
-    const author = getRandomElement(users);
-    const daysAgo = getRandomInt(0, 180); // 過去180日間
-    const hoursAgo = getRandomInt(0, 23);
-    const minutesAgo = getRandomInt(0, 59);
-
-    const createdAt = new Date(now);
-    createdAt.setDate(createdAt.getDate() - daysAgo);
-    createdAt.setHours(createdAt.getHours() - hoursAgo);
-    createdAt.setMinutes(createdAt.getMinutes() - minutesAgo);
-
-    thoughts.push({
-      id: `thought-${i + 1}`,
-      content: generateRandomContent(),
-      createdAt,
-      tags: generateRandomTags(),
-      author: { ...author },
-      reactions: generateRandomReactions(),
-      replyCount: getRandomInt(0, 10),
-      allowReplies: Math.random() > 0.3, // 70%の投稿で返信可能
-    });
-  }
-
-  // 日付順にソート（新しい順）
-  thoughts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-
-  return thoughts;
+  return mockThoughts;
 }
 
-// 特定ユーザーの投稿を取得
-export function getThoughtsByUserId(thoughts: Thought[], userId: string): Thought[] {
-  return thoughts.filter(t => t.author.id === userId);
+export function getThoughtsByTag(tag: string): Thought[] {
+  return mockThoughts.filter(thought => thought.tags?.includes(tag));
 }
 
-// タグで投稿をフィルター
-export function getThoughtsByTag(thoughts: Thought[], tag: string): Thought[] {
-  return thoughts.filter(t => t.tags?.includes(tag));
-}
-
-export { users };
 export type { Thought, Reaction };
