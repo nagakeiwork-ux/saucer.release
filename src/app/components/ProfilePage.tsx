@@ -11,8 +11,13 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
   Grid,
+  TextField,
+  Alert,
+  IconButton,
 } from '@mui/material';
+
 import {
   EmojiEvents as TrophyIcon,
   Edit as EditIcon,
@@ -20,6 +25,7 @@ import {
   Logout as LogoutIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../../hooks/useAuth';
+import { getNameChangeInfo, updateDisplayName } from '../../services/supabaseService';
 
 const AVATAR_OPTIONS = [
   { id: 'lion', emoji: '🦁', name: 'ライオン' },
@@ -33,7 +39,14 @@ export function ProfilePage() {
   const { user, signInWithGoogle, signOut } = useAuth();
   const [selectedAvatar, setSelectedAvatar] = useState<string>('lion');
   const [showAvatarDialog, setShowAvatarDialog] = useState(false);
-
+  const [showNameDialog, setShowNameDialog] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [nameChangeInfo, setNameChangeInfo] = useState<{
+    remainingChanges: number;
+    count: number;
+    canChange: boolean;
+  } | null>(null);
+  const [nameError, setNameError] = useState('');
   // ローカルストレージからアバターを読み込み
   useEffect(() => {
     const savedAvatar = localStorage.getItem('userAvatar');
@@ -41,6 +54,22 @@ export function ProfilePage() {
       setSelectedAvatar(savedAvatar);
     }
   }, []);
+    // 名前変更情報を取得
+  useEffect(() => {
+    if (user?.id) {
+      loadNameChangeInfo();
+    }
+  }, [user]);
+
+  const loadNameChangeInfo = async () => {
+    if (!user?.id) return;
+    try {
+      const info = await getNameChangeInfo(user.id);
+      setNameChangeInfo(info);
+    } catch (error) {
+      console.error('Failed to load name change info:', error);
+    }
+  };
 
   const handleGoogleLogin = async () => {
     try {
@@ -63,6 +92,39 @@ export function ProfilePage() {
     setSelectedAvatar(avatarId);
     localStorage.setItem('userAvatar', avatarId);
     setShowAvatarDialog(false);
+  };
+  const handleOpenNameDialog = () => {
+    setNewName(displayName);
+    setNameError('');
+    setShowNameDialog(true);
+  };
+
+  const handleNameChange = async () => {
+    if (!user?.id) return;
+
+    // バリデーション
+    if (!newName.trim()) {
+      setNameError('名前を入力してください');
+      return;
+    }
+
+    if (newName.length > 30) {
+      setNameError('名前は30文字以内で入力してください');
+      return;
+    }
+
+    try {
+      await updateDisplayName(user.id, newName.trim());
+      setShowNameDialog(false);
+      setNameError('');
+      // 名前変更情報を再取得
+      await loadNameChangeInfo();
+      // ページをリロードして最新のプロフィールを表示
+      window.location.reload();
+    } catch (error: any) {
+      console.error('Failed to update name:', error);
+      setNameError(error.message || '名前の変更に失敗しました');
+    }
   };
 
   // ユーザー情報を取得
@@ -145,9 +207,23 @@ export function ProfilePage() {
           </Button>
         </Box>
 
-        <Typography variant="h5" sx={{ fontWeight: 600, color: '#2d3748', mb: 0.5 }}>
-          {displayName}
-        </Typography>
+        <Stack direction="row" alignItems="center" justifyContent="center" spacing={1}>
+          <Typography variant="h5" sx={{ fontWeight: 600, color: '#2d3748' }}>
+            {displayName}
+          </Typography>
+          {user && (
+            <IconButton
+              size="small"
+              onClick={handleOpenNameDialog}
+              sx={{
+                color: '#6366f1',
+                '&:hover': { bgcolor: '#ede9fe' },
+              }}
+            >
+              <EditIcon fontSize="small" />
+            </IconButton>
+          )}
+        </Stack>
 
         <Stack direction="row" spacing={1} justifyContent="center" sx={{ mt: 2 }}>
           <Chip
@@ -201,7 +277,60 @@ export function ProfilePage() {
           </Grid>
         </DialogContent>
       </Dialog>
+{/* 名前編集ダイアログ */}
+      <Dialog open={showNameDialog} onClose={() => setShowNameDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 600 }}>
+          表示名を変更
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 2 }}>
+            <Alert severity="info" sx={{ mb: 3 }}>
+              <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
+                📝 名前変更の制限について
+              </Typography>
+              <Typography variant="caption" sx={{ display: 'block', mb: 1 }}>
+                • 名前は1ヶ月に5回まで変更できます<br />
+                • 今月の残り変更回数: {nameChangeInfo?.remainingChanges || 0}回<br />
+                • 既に{nameChangeInfo?.count || 0}回変更済み
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#d97706', fontWeight: 600 }}>
+                ⚠️ 慎重に名前を選んでください
+              </Typography>
+            </Alert>
 
+            <TextField
+              fullWidth
+              label="新しい名前"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              error={!!nameError}
+              helperText={nameError || '30文字以内で入力してください'}
+              inputProps={{ maxLength: 30 }}
+              sx={{ mb: 2 }}
+            />
+
+            <Typography variant="caption" sx={{ color: '#718096' }}>
+              現在: {displayName}
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setShowNameDialog(false)} sx={{ color: '#718096' }}>
+            キャンセル
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleNameChange}
+            disabled={!nameChangeInfo?.canChange}
+            sx={{
+              bgcolor: '#6366f1',
+              '&:hover': { bgcolor: '#4f46e5' },
+            }}
+          >
+            変更する
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Card
         elevation={3}
         sx={{

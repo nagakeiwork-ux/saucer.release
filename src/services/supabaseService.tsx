@@ -26,7 +26,56 @@ export async function updateProfile(userId: string, updates: any) {
   if (error) throw error;
   return data;
 }
+export async function canChangeName(userId: string) {
+  const { data, error } = await supabase.rpc('can_change_name', { user_id: userId });
 
+  if (error) throw error;
+  return data as boolean;
+}
+
+export async function getNameChangeInfo(userId: string) {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('name_change_count, last_name_change_at')
+    .eq('id', userId)
+    .single();
+
+  if (error) throw error;
+
+  const count = data?.name_change_count || 0;
+  const lastChange = data?.last_name_change_at;
+
+  // 1ヶ月以上経過していればカウントは0扱い
+  const isExpired = !lastChange || new Date(lastChange) < new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const remainingChanges = isExpired ? 5 : Math.max(0, 5 - count);
+
+  return {
+    count: isExpired ? 0 : count,
+    remainingChanges,
+    lastChange: lastChange ? new Date(lastChange) : null,
+    canChange: remainingChanges > 0
+  };
+}
+
+export async function updateDisplayName(userId: string, newName: string) {
+  // 名前変更可能かチェック
+  const canChange = await canChangeName(userId);
+
+  if (!canChange) {
+    throw new Error('今月の名前変更回数の上限（5回）に達しています。来月まで変更できません。');
+  }
+
+  // 名前を更新（トリガーが自動的にカウントを更新）
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({ display_name: newName })
+    .eq('id', userId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
 // ========== 投稿 ==========
 
 export async function getThoughts(filters?: { tags?: string[]; userId?: string }) {
