@@ -112,30 +112,18 @@ export function ProfilePage() {
         )}
 
         <Box sx={{ position: 'relative', display: 'inline-block' }}>
-          {avatarUrl ? (
-            <Avatar
-              src={avatarUrl}
-              sx={{
-                width: 80,
-                height: 80,
-                margin: '0 auto',
-                mb: 2,
-              }}
-            />
-          ) : (
-            <Avatar
-              sx={{
-                width: 80,
-                height: 80,
-                fontSize: '3rem',
-                bgcolor: '#6366f1',
-                margin: '0 auto',
-                mb: 2,
-              }}
-            >
-              {currentAvatar?.emoji}
-            </Avatar>
-          )}
+          <Avatar
+            sx={{
+              width: 80,
+              height: 80,
+              fontSize: '3rem',
+              bgcolor: '#6366f1',
+              margin: '0 auto',
+              mb: 2,
+            }}
+          >
+            {currentAvatar?.emoji}
+          </Avatar>
           <Button
             size="small"
             variant="contained"
